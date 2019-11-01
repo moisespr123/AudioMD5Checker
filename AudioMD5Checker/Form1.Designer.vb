@@ -25,13 +25,14 @@ Partial Class Form1
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel()
         Me.Panel1 = New System.Windows.Forms.Panel()
         Me.ListView1 = New System.Windows.Forms.ListView()
+        Me.Button1 = New System.Windows.Forms.Button()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.Panel2 = New System.Windows.Forms.Panel()
+        Me.Button2 = New System.Windows.Forms.Button()
         Me.ListView2 = New System.Windows.Forms.ListView()
         Me.Label2 = New System.Windows.Forms.Label()
-        Me.Button1 = New System.Windows.Forms.Button()
-        Me.Button2 = New System.Windows.Forms.Button()
         Me.Label3 = New System.Windows.Forms.Label()
+        Me.Button3 = New System.Windows.Forms.Button()
         Me.TableLayoutPanel1.SuspendLayout()
         Me.Panel1.SuspendLayout()
         Me.Panel2.SuspendLayout()
@@ -75,10 +76,21 @@ Partial Class Form1
         Me.ListView1.HideSelection = False
         Me.ListView1.Location = New System.Drawing.Point(6, 20)
         Me.ListView1.Name = "ListView1"
-        Me.ListView1.Size = New System.Drawing.Size(373, 368)
+        Me.ListView1.Size = New System.Drawing.Size(373, 335)
         Me.ListView1.TabIndex = 1
         Me.ListView1.UseCompatibleStateImageBehavior = False
         Me.ListView1.View = System.Windows.Forms.View.SmallIcon
+        '
+        'Button1
+        '
+        Me.Button1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Button1.Location = New System.Drawing.Point(6, 361)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(373, 52)
+        Me.Button1.TabIndex = 1
+        Me.Button1.Text = "Check"
+        Me.Button1.UseVisualStyleBackColor = True
         '
         'Label1
         '
@@ -91,6 +103,7 @@ Partial Class Form1
         '
         'Panel2
         '
+        Me.Panel2.Controls.Add(Me.Button3)
         Me.Panel2.Controls.Add(Me.Button2)
         Me.Panel2.Controls.Add(Me.ListView2)
         Me.Panel2.Controls.Add(Me.Label2)
@@ -99,6 +112,17 @@ Partial Class Form1
         Me.Panel2.Name = "Panel2"
         Me.Panel2.Size = New System.Drawing.Size(382, 423)
         Me.Panel2.TabIndex = 1
+        '
+        'Button2
+        '
+        Me.Button2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Button2.Location = New System.Drawing.Point(3, 361)
+        Me.Button2.Name = "Button2"
+        Me.Button2.Size = New System.Drawing.Size(376, 23)
+        Me.Button2.TabIndex = 2
+        Me.Button2.Text = "Clear"
+        Me.Button2.UseVisualStyleBackColor = True
         '
         'ListView2
         '
@@ -110,7 +134,7 @@ Partial Class Form1
         Me.ListView2.HideSelection = False
         Me.ListView2.Location = New System.Drawing.Point(3, 20)
         Me.ListView2.Name = "ListView2"
-        Me.ListView2.Size = New System.Drawing.Size(376, 368)
+        Me.ListView2.Size = New System.Drawing.Size(376, 335)
         Me.ListView2.TabIndex = 1
         Me.ListView2.UseCompatibleStateImageBehavior = False
         Me.ListView2.View = System.Windows.Forms.View.SmallIcon
@@ -124,28 +148,6 @@ Partial Class Form1
         Me.Label2.TabIndex = 0
         Me.Label2.Text = "Step 2: Drag and drop files to compare source files:"
         '
-        'Button1
-        '
-        Me.Button1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Button1.Location = New System.Drawing.Point(6, 394)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(373, 23)
-        Me.Button1.TabIndex = 1
-        Me.Button1.Text = "Check"
-        Me.Button1.UseVisualStyleBackColor = True
-        '
-        'Button2
-        '
-        Me.Button2.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Button2.Location = New System.Drawing.Point(3, 394)
-        Me.Button2.Name = "Button2"
-        Me.Button2.Size = New System.Drawing.Size(376, 23)
-        Me.Button2.TabIndex = 2
-        Me.Button2.Text = "Clear"
-        Me.Button2.UseVisualStyleBackColor = True
-        '
         'Label3
         '
         Me.Label3.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
@@ -154,7 +156,18 @@ Partial Class Form1
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(128, 13)
         Me.Label3.TabIndex = 1
-        Me.Label3.Text = "v0.1 - By Moisés Cardona"
+        Me.Label3.Text = "v0.2 - By Moisés Cardona"
+        '
+        'Button3
+        '
+        Me.Button3.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Button3.Location = New System.Drawing.Point(3, 390)
+        Me.Button3.Name = "Button3"
+        Me.Button3.Size = New System.Drawing.Size(376, 23)
+        Me.Button3.TabIndex = 3
+        Me.Button3.Text = "Save Results"
+        Me.Button3.UseVisualStyleBackColor = True
         '
         'Form1
         '
@@ -186,4 +199,5 @@ Partial Class Form1
     Friend WithEvents ListView2 As ListView
     Friend WithEvents Button2 As Button
     Friend WithEvents Label3 As Label
+    Friend WithEvents Button3 As Button
 End Class

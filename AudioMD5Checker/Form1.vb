@@ -89,4 +89,28 @@ Public Class Form1
         ListView1.Items.Clear()
         ListView2.Items.Clear()
     End Sub
+
+    Private Sub SaveResults(listView As ListView)
+        Dim saveFileDialog As New SaveFileDialog With {
+            .Title = "Save the verified files list.",
+            .Filter = "CSV File|*.csv"}
+        Dim result As DialogResult = saveFileDialog.ShowDialog
+        If result = DialogResult.OK Then
+            Dim VerifiedResults As String = ""
+            For Each item In listView.Items
+                Dim HashResult As String = "NOT CHECKED"
+                If listView.Items(listView.Items.IndexOf(item)).BackColor = Color.LimeGreen Then
+                    HashResult = "MATCH"
+                ElseIf listView.Items(listView.Items.IndexOf(item)).BackColor = Color.Red Then
+                    HashResult = "MISMATCH"
+                End If
+                VerifiedResults += """" + listView.Items(listView.Items.IndexOf(item)).Text + """," + HashResult + Environment.NewLine
+            Next
+            IO.File.WriteAllText(saveFileDialog.FileName, VerifiedResults)
+            MessageBox.Show("File list saved")
+        End If
+    End Sub
+    Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
+        SaveResults(ListView2)
+    End Sub
 End Class
