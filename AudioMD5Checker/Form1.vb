@@ -110,7 +110,28 @@ Public Class Form1
             MessageBox.Show("File list saved")
         End If
     End Sub
+
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
         SaveResults(ListView2)
+    End Sub
+
+    Private Sub CheckFfmpeg()
+        Try
+            Dim ffmpegProcessInfo As New ProcessStartInfo
+            Dim ffmpegProcess As Process
+            ffmpegProcessInfo.FileName = "ffmpeg.exe"
+            ffmpegProcessInfo.CreateNoWindow = True
+            ffmpegProcessInfo.RedirectStandardError = True
+            ffmpegProcessInfo.UseShellExecute = False
+            ffmpegProcess = Process.Start(ffmpegProcessInfo)
+            ffmpegProcess.WaitForExit()
+        Catch ex As Exception
+            MessageBox.Show("ffmpeg.exe was not found. Exiting")
+            Me.Close()
+        End Try
+    End Sub
+
+    Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        CheckFfmpeg()
     End Sub
 End Class
