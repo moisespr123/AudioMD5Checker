@@ -56,38 +56,55 @@ Public Class Form1
                 ListView2.Items(ListView1.Items.IndexOf(file)).Focused = True
                 ListView2.Items(ListView1.Items.IndexOf(file)).EnsureVisible()
                 ListView2.Select()
-                ffmpeg_process(file.Text, 1)
-                ffmpeg_process(ListView2.Items.Item(ListView1.Items.IndexOf(file)).Text, 2)
-                If My.Computer.FileSystem.ReadAllText("test1.md5") = My.Computer.FileSystem.ReadAllText("test2.md5") Then
-                    ListView1.Items(ListView1.Items.IndexOf(file)).BackColor = Color.LimeGreen
-                    ListView2.Items(ListView1.Items.IndexOf(file)).BackColor = Color.LimeGreen
+                Dim hash1 As String = ffmpeg_process(file.Text, 1)
+                Dim hash2 As String = ffmpeg_process(ListView2.Items.Item(ListView1.Items.IndexOf(file)).Text, 2)
+                ListBox1.Items.Add(hash1)
+                If Not hash1 = String.Empty And Not hash2 = String.Empty Then
+                    If hash1 = hash2 Then
+                        ListView1.Items(ListView1.Items.IndexOf(file)).BackColor = Color.LimeGreen
+                        ListView2.Items(ListView1.Items.IndexOf(file)).BackColor = Color.LimeGreen
+                    Else
+                        ListView1.Items(ListView1.Items.IndexOf(file)).BackColor = Color.Red
+                        ListView2.Items(ListView1.Items.IndexOf(file)).BackColor = Color.Red
+                    End If
                 Else
-                    ListView1.Items(ListView1.Items.IndexOf(file)).BackColor = Color.Red
-                    ListView2.Items(ListView1.Items.IndexOf(file)).BackColor = Color.Red
+                    MsgBox("Error checking hash")
+                    Exit For
                 End If
-                My.Computer.FileSystem.DeleteFile("test1.md5")
-                My.Computer.FileSystem.DeleteFile("test2.md5")
+                ListView1.SelectedItems.Clear()
+                ListView2.SelectedItems.Clear()
             Next
             MsgBox("Done")
         Else
             MsgBox("Item size are different. Lists sizes must match.")
         End If
     End Sub
-    Private Sub ffmpeg_process(Input As String, Item As Integer)
+    Private Function ffmpeg_process(Input As String, Item As Integer) As String
         Dim ffmpegProcessInfo As New ProcessStartInfo
         Dim ffmpegProcess As Process
         ffmpegProcessInfo.FileName = "ffmpeg.exe"
-        ffmpegProcessInfo.Arguments = "-i """ + Input + """ -vn -f md5 test" + Item.ToString() + ".md5 -y"
+        ffmpegProcessInfo.Arguments = "-i """ + Input + """ -vn -f md5 - -y"
         ffmpegProcessInfo.CreateNoWindow = True
-        ffmpegProcessInfo.RedirectStandardOutput = False
+        ffmpegProcessInfo.RedirectStandardOutput = True
         ffmpegProcessInfo.UseShellExecute = False
         ffmpegProcess = Process.Start(ffmpegProcessInfo)
-        ffmpegProcess.WaitForExit()
-    End Sub
+        Dim CurrentLine As String = String.Empty
+        While Not ffmpegProcess.HasExited
+            While Not ffmpegProcess.StandardOutput.EndOfStream
+                CurrentLine = ffmpegProcess.StandardOutput.ReadLine
+                If CurrentLine.Contains("MD5=") Then
+                    CurrentLine = CurrentLine.Split("=")(1)
+                    Exit While
+                End If
+            End While
+        End While
+        Return CurrentLine
+    End Function
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
         ListView1.Items.Clear()
         ListView2.Items.Clear()
+        ListBox1.Items.Clear()
     End Sub
 
     Private Sub SaveResults(listView As ListView)
@@ -104,7 +121,7 @@ Public Class Form1
                 ElseIf listView.Items(listView.Items.IndexOf(item)).BackColor = Color.Red Then
                     HashResult = "MISMATCH"
                 End If
-                VerifiedResults += """" + listView.Items(listView.Items.IndexOf(item)).Text + """," + HashResult + Environment.NewLine
+                VerifiedResults += """" + listView.Items(listView.Items.IndexOf(item)).Text + """," + HashResult + "," + ListBox1.Items(listView.Items.IndexOf(item)) + Environment.NewLine
             Next
             IO.File.WriteAllText(saveFileDialog.FileName, VerifiedResults)
             MessageBox.Show("File list saved")

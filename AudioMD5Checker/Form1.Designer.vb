@@ -28,11 +28,13 @@ Partial Class Form1
         Me.Button1 = New System.Windows.Forms.Button()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.Panel2 = New System.Windows.Forms.Panel()
+        Me.Button3 = New System.Windows.Forms.Button()
         Me.Button2 = New System.Windows.Forms.Button()
         Me.ListView2 = New System.Windows.Forms.ListView()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.Label3 = New System.Windows.Forms.Label()
-        Me.Button3 = New System.Windows.Forms.Button()
+        Me.Label4 = New System.Windows.Forms.Label()
+        Me.ListBox1 = New System.Windows.Forms.ListBox()
         Me.TableLayoutPanel1.SuspendLayout()
         Me.Panel1.SuspendLayout()
         Me.Panel2.SuspendLayout()
@@ -52,7 +54,7 @@ Partial Class Form1
         Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
         Me.TableLayoutPanel1.RowCount = 1
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
-        Me.TableLayoutPanel1.Size = New System.Drawing.Size(776, 429)
+        Me.TableLayoutPanel1.Size = New System.Drawing.Size(670, 429)
         Me.TableLayoutPanel1.TabIndex = 0
         '
         'Panel1
@@ -63,7 +65,7 @@ Partial Class Form1
         Me.Panel1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.Panel1.Location = New System.Drawing.Point(3, 3)
         Me.Panel1.Name = "Panel1"
-        Me.Panel1.Size = New System.Drawing.Size(382, 423)
+        Me.Panel1.Size = New System.Drawing.Size(329, 423)
         Me.Panel1.TabIndex = 0
         '
         'ListView1
@@ -76,7 +78,7 @@ Partial Class Form1
         Me.ListView1.HideSelection = False
         Me.ListView1.Location = New System.Drawing.Point(6, 20)
         Me.ListView1.Name = "ListView1"
-        Me.ListView1.Size = New System.Drawing.Size(373, 335)
+        Me.ListView1.Size = New System.Drawing.Size(320, 335)
         Me.ListView1.TabIndex = 1
         Me.ListView1.UseCompatibleStateImageBehavior = False
         Me.ListView1.View = System.Windows.Forms.View.SmallIcon
@@ -87,7 +89,7 @@ Partial Class Form1
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Button1.Location = New System.Drawing.Point(6, 361)
         Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(373, 52)
+        Me.Button1.Size = New System.Drawing.Size(320, 52)
         Me.Button1.TabIndex = 1
         Me.Button1.Text = "Check"
         Me.Button1.UseVisualStyleBackColor = True
@@ -108,10 +110,21 @@ Partial Class Form1
         Me.Panel2.Controls.Add(Me.ListView2)
         Me.Panel2.Controls.Add(Me.Label2)
         Me.Panel2.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.Panel2.Location = New System.Drawing.Point(391, 3)
+        Me.Panel2.Location = New System.Drawing.Point(338, 3)
         Me.Panel2.Name = "Panel2"
-        Me.Panel2.Size = New System.Drawing.Size(382, 423)
+        Me.Panel2.Size = New System.Drawing.Size(329, 423)
         Me.Panel2.TabIndex = 1
+        '
+        'Button3
+        '
+        Me.Button3.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Button3.Location = New System.Drawing.Point(3, 390)
+        Me.Button3.Name = "Button3"
+        Me.Button3.Size = New System.Drawing.Size(323, 23)
+        Me.Button3.TabIndex = 3
+        Me.Button3.Text = "Save Results"
+        Me.Button3.UseVisualStyleBackColor = True
         '
         'Button2
         '
@@ -119,7 +132,7 @@ Partial Class Form1
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.Button2.Location = New System.Drawing.Point(3, 361)
         Me.Button2.Name = "Button2"
-        Me.Button2.Size = New System.Drawing.Size(376, 23)
+        Me.Button2.Size = New System.Drawing.Size(323, 23)
         Me.Button2.TabIndex = 2
         Me.Button2.Text = "Clear"
         Me.Button2.UseVisualStyleBackColor = True
@@ -134,7 +147,7 @@ Partial Class Form1
         Me.ListView2.HideSelection = False
         Me.ListView2.Location = New System.Drawing.Point(3, 20)
         Me.ListView2.Name = "ListView2"
-        Me.ListView2.Size = New System.Drawing.Size(376, 335)
+        Me.ListView2.Size = New System.Drawing.Size(323, 335)
         Me.ListView2.TabIndex = 1
         Me.ListView2.UseCompatibleStateImageBehavior = False
         Me.ListView2.View = System.Windows.Forms.View.SmallIcon
@@ -156,25 +169,35 @@ Partial Class Form1
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(128, 13)
         Me.Label3.TabIndex = 1
-        Me.Label3.Text = "v0.2 - By Moisés Cardona"
+        Me.Label3.Text = "v0.3 - By Moisés Cardona"
         '
-        'Button3
+        'Label4
         '
-        Me.Button3.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Button3.Location = New System.Drawing.Point(3, 390)
-        Me.Button3.Name = "Button3"
-        Me.Button3.Size = New System.Drawing.Size(376, 23)
-        Me.Button3.TabIndex = 3
-        Me.Button3.Text = "Save Results"
-        Me.Button3.UseVisualStyleBackColor = True
+        Me.Label4.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Label4.AutoSize = True
+        Me.Label4.Location = New System.Drawing.Point(686, 19)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(102, 13)
+        Me.Label4.TabIndex = 2
+        Me.Label4.Text = "Source Checksums:"
+        '
+        'ListBox1
+        '
+        Me.ListBox1.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.ListBox1.FormattingEnabled = True
+        Me.ListBox1.Location = New System.Drawing.Point(688, 35)
+        Me.ListBox1.Name = "ListBox1"
+        Me.ListBox1.Size = New System.Drawing.Size(254, 342)
+        Me.ListBox1.TabIndex = 3
         '
         'Form1
         '
         Me.AllowDrop = True
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(800, 481)
+        Me.ClientSize = New System.Drawing.Size(954, 481)
+        Me.Controls.Add(Me.ListBox1)
+        Me.Controls.Add(Me.Label4)
         Me.Controls.Add(Me.Label3)
         Me.Controls.Add(Me.TableLayoutPanel1)
         Me.Name = "Form1"
@@ -200,4 +223,6 @@ Partial Class Form1
     Friend WithEvents Button2 As Button
     Friend WithEvents Label3 As Label
     Friend WithEvents Button3 As Button
+    Friend WithEvents Label4 As Label
+    Friend WithEvents ListBox1 As ListBox
 End Class
