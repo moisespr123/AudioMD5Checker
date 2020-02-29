@@ -10,7 +10,7 @@ Public Class Form1
     End Sub
     Private Sub GetDirectoriesAndFiles(ByVal BaseFolder As DirectoryInfo, listView As ListView)
         For Each file As FileInfo In BaseFolder.GetFiles
-            If Extensions.Contains(file.Extension) Then listView.Items.Add(file.FullName)
+            If Extensions.Contains(file.Extension.ToLower) Then listView.Items.Add(file.FullName)
         Next
         For Each subF As DirectoryInfo In BaseFolder.GetDirectories()
             Application.DoEvents()
@@ -45,39 +45,64 @@ Public Class Form1
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
         If ListView1.Items.Count = ListView2.Items.Count Then
-            For Each file In ListView1.Items
-                ListView1.SelectedItems.Clear()
-                ListView1.Items(ListView1.Items.IndexOf(file)).Selected = True
-                ListView1.Items(ListView1.Items.IndexOf(file)).Focused = True
-                ListView1.Items(ListView1.Items.IndexOf(file)).EnsureVisible()
-                ListView1.Select()
-                ListView2.SelectedItems.Clear()
-                ListView2.Items(ListView1.Items.IndexOf(file)).Selected = True
-                ListView2.Items(ListView1.Items.IndexOf(file)).Focused = True
-                ListView2.Items(ListView1.Items.IndexOf(file)).EnsureVisible()
-                ListView2.Select()
-                Dim hash1 As String = ffmpeg_process(file.Text, 1)
-                Dim hash2 As String = ffmpeg_process(ListView2.Items.Item(ListView1.Items.IndexOf(file)).Text, 2)
-                ListBox1.Items.Add(hash1)
-                If Not hash1 = String.Empty And Not hash2 = String.Empty Then
-                    If hash1 = hash2 Then
-                        ListView1.Items(ListView1.Items.IndexOf(file)).BackColor = Color.LimeGreen
-                        ListView2.Items(ListView1.Items.IndexOf(file)).BackColor = Color.LimeGreen
-                    Else
-                        ListView1.Items(ListView1.Items.IndexOf(file)).BackColor = Color.Red
-                        ListView2.Items(ListView1.Items.IndexOf(file)).BackColor = Color.Red
-                    End If
-                Else
-                    MsgBox("Error checking hash")
-                    Exit For
-                End If
-                ListView1.SelectedItems.Clear()
-                ListView2.SelectedItems.Clear()
+            ListView1.SelectedItems.Clear()
+            ListView2.SelectedItems.Clear()
+            Dim ListView1Items As ListViewItem() = New ListViewItem(ListView1.Items.Count - 1) {}
+            Dim ListView2Items As ListViewItem() = New ListViewItem(ListView2.Items.Count - 1) {}
+            ListView1.Items.CopyTo(ListView1Items, 0)
+            ListView2.Items.CopyTo(ListView2Items, 0)
+            For Each item In ListView1Items
+                ListBox1.Items.Add(String.Empty)
             Next
-            MsgBox("Done")
+            Button1.Enabled = False
+            Button2.Enabled = False
+            Button3.Enabled = False
+            Dim StartTasks As New Threading.Thread(Sub() CheckThread(ListView1Items, ListView2Items))
+            StartTasks.Start()
         Else
             MsgBox("Item size are different. Lists sizes must match.")
         End If
+    End Sub
+    Private Sub CheckThread(ListView1Items As ListViewItem(), ListView2Items As ListViewItem())
+        Dim tasks = New List(Of Action)
+        For Each file In ListView1Items
+            tasks.Add(Sub() FileChecker(file, ListView1Items, ListView2Items))
+        Next
+        Parallel.Invoke(New ParallelOptions With {.MaxDegreeOfParallelism = Environment.ProcessorCount}, tasks.ToArray())
+        Button1.BeginInvoke(Sub()
+                                Button1.Enabled = True
+                                Button2.Enabled = True
+                                Button3.Enabled = True
+                            End Sub)
+        MsgBox("Done")
+    End Sub
+
+    Private Sub FileChecker(file As ListViewItem, ListView1Items As ListViewItem(), ListView2Items As ListViewItem())
+        Dim hash1 As String = ffmpeg_process(file.Text, 1)
+        Dim hash2 As String = ffmpeg_process(ListView2Items(Array.IndexOf(ListView1Items, file)).Text, 2)
+        If Not hash1 = String.Empty And Not hash2 = String.Empty Then
+            ListBox1.BeginInvoke(Sub() ListBox1.Items(ListView1.Items.IndexOf(file)) = hash1)
+            If hash1 = hash2 Then
+                ListView1.BeginInvoke(Sub()
+                                          ListView1.Items(ListView1.Items.IndexOf(file)).BackColor = Color.LimeGreen
+                                          ListView2.Items(ListView1.Items.IndexOf(file)).BackColor = Color.LimeGreen
+                                      End Sub)
+            Else
+                ListView1.BeginInvoke(Sub()
+                                          ListView1.Items(ListView1.Items.IndexOf(file)).BackColor = Color.Red
+                                          ListView2.Items(ListView1.Items.IndexOf(file)).BackColor = Color.Red
+                                      End Sub)
+            End If
+        Else
+            ListView1.BeginInvoke(Sub()
+                                      ListView1.Items(ListView1.Items.IndexOf(file)).BackColor = Color.Tomato
+                                      ListView2.Items(ListView1.Items.IndexOf(file)).BackColor = Color.Tomato
+                                  End Sub)
+        End If
+        ListView1.BeginInvoke(Sub()
+                                  ListView1.SelectedItems.Clear()
+                                  ListView2.SelectedItems.Clear()
+                              End Sub)
     End Sub
     Private Function ffmpeg_process(Input As String, Item As Integer) As String
         Dim ffmpegProcessInfo As New ProcessStartInfo
