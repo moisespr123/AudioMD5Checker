@@ -1,6 +1,10 @@
 ﻿Imports System.IO
 Public Class Form1
     Private Extensions As String() = {".mp3", ".flac", ".wav"}
+    Private SourceFrameMd5List As List(Of String) = New List(Of String)
+    Private DestFrameMd5List As List(Of String) = New List(Of String)
+    Private SourceFrameMd5MismatchList As List(Of String) = New List(Of String)
+    Private DestFrameMd5MismatchList As List(Of String) = New List(Of String)
     Private Sub ListView1_DragEnter(sender As Object, e As DragEventArgs) Handles ListView1.DragEnter
         DragEnterEvent(sender, e)
     End Sub
@@ -34,7 +38,7 @@ Public Class Form1
             If Directory.Exists(path) Then
                 GetDirectoriesAndFiles(New DirectoryInfo(path), listView)
             Else
-                listView.Items.Add(path)
+                If Extensions.Contains(IO.Path.GetExtension(path).ToLower) Then listView.Items.Add(path)
             End If
         Next
     End Sub
@@ -51,8 +55,19 @@ Public Class Form1
             Dim ListView2Items As ListViewItem() = New ListViewItem(ListView2.Items.Count - 1) {}
             ListView1.Items.CopyTo(ListView1Items, 0)
             ListView2.Items.CopyTo(ListView2Items, 0)
+            SourceFrameMd5List.Clear()
+            DestFrameMd5List.Clear()
+            SourceFrameMd5MismatchList.Clear()
+            DestFrameMd5MismatchList.Clear()
+            ListBox1.Items.Clear()
+            ListBox2.Items.Clear()
             For Each item In ListView1Items
+                SourceFrameMd5List.Add(String.Empty)
+                SourceFrameMd5MismatchList.Add(String.Empty)
+                DestFrameMd5List.Add(String.Empty)
+                DestFrameMd5MismatchList.Add(String.Empty)
                 ListBox1.Items.Add(String.Empty)
+                ListBox2.Items.Add(String.Empty)
             Next
             Button1.Enabled = False
             Button2.Enabled = False
@@ -78,10 +93,42 @@ Public Class Form1
     End Sub
 
     Private Sub FileChecker(file As ListViewItem, ListView1Items As ListViewItem(), ListView2Items As ListViewItem())
-        Dim hash1 As String = ffmpeg_process(file.Text, 1)
-        Dim hash2 As String = ffmpeg_process(ListView2Items(Array.IndexOf(ListView1Items, file)).Text, 2)
+        Dim hash1 As String = ffmpeg_process(file.Text)
+        Dim hash2 As String = ffmpeg_process(ListView2Items(Array.IndexOf(ListView1Items, file)).Text)
+        Dim FrameHash1 As String = ffmpeg__framemd5_process(file.Text)
+        Dim FrameHash2 As String = ffmpeg__framemd5_process(ListView2Items(Array.IndexOf(ListView1Items, file)).Text)
         If Not hash1 = String.Empty And Not hash2 = String.Empty Then
-            ListBox1.BeginInvoke(Sub() ListBox1.Items(ListView1.Items.IndexOf(file)) = hash1)
+            Dim FramesMismatches As Integer = 0
+            Dim splittedFrameHash1 As String() = FrameHash1.Split(Environment.NewLine)
+            Dim splittedFrameHash2 As String() = FrameHash2.Split(Environment.NewLine)
+            Dim SourceMismatch As String = String.Empty
+            Dim DestMismatch As String = String.Empty
+            Dim counter As Integer = 0
+            For Each Line In splittedFrameHash1
+                If splittedFrameHash2.Count - 1 >= counter And splittedFrameHash1.Count - 1 >= counter Then
+                    If Not Line.Contains("#") Then
+                        If splittedFrameHash2(counter) <> Line Then
+                            FramesMismatches += 1
+                            SourceMismatch += Line.Trim() + Environment.NewLine
+                            DestMismatch += splittedFrameHash2(counter).Trim() + Environment.NewLine
+                        End If
+                    End If
+                Else
+                    Exit For
+                End If
+                counter += 1
+            Next
+            If splittedFrameHash1.Count > splittedFrameHash2.Count Then
+                For i = splittedFrameHash1.Count - 1 To splittedFrameHash2.Count - 1
+                    FramesMismatches += 1
+                    SourceMismatch += splittedFrameHash1(i).Trim() + Environment.NewLine
+                Next
+            ElseIf splittedFrameHash2.Count > splittedFrameHash1.Count Then
+                For i = splittedFrameHash2.Count - 1 To splittedFrameHash1.Count - 1
+                    FramesMismatches += 1
+                    SourceMismatch += splittedFrameHash1(i).Trim() + Environment.NewLine
+                Next
+            End If
             If hash1 = hash2 Then
                 ListView1.BeginInvoke(Sub()
                                           ListView1.Items(ListView1.Items.IndexOf(file)).BackColor = Color.LimeGreen
@@ -93,6 +140,14 @@ Public Class Form1
                                           ListView2.Items(ListView1.Items.IndexOf(file)).BackColor = Color.Red
                                       End Sub)
             End If
+            ListBox1.BeginInvoke(Sub()
+                                     ListBox1.Items(ListView1.Items.IndexOf(file)) = hash1
+                                     ListBox2.Items(ListView1.Items.IndexOf(file)) = FramesMismatches.ToString()
+                                     SourceFrameMd5List(ListView1.Items.IndexOf(file)) = FrameHash1
+                                     DestFrameMd5List(ListView1.Items.IndexOf(file)) = FrameHash2
+                                     SourceFrameMd5MismatchList(ListView1.Items.IndexOf(file)) = SourceMismatch
+                                     DestFrameMd5MismatchList(ListView1.Items.IndexOf(file)) = DestMismatch
+                                 End Sub)
         Else
             ListView1.BeginInvoke(Sub()
                                       ListView1.Items(ListView1.Items.IndexOf(file)).BackColor = Color.Tomato
@@ -104,7 +159,7 @@ Public Class Form1
                                   ListView2.SelectedItems.Clear()
                               End Sub)
     End Sub
-    Private Function ffmpeg_process(Input As String, Item As Integer) As String
+    Private Function ffmpeg_process(Input As String) As String
         Dim ffmpegProcessInfo As New ProcessStartInfo
         Dim ffmpegProcess As Process
         ffmpegProcessInfo.FileName = "ffmpeg.exe"
@@ -126,10 +181,33 @@ Public Class Form1
         Return CurrentLine
     End Function
 
+    Private Function ffmpeg__framemd5_process(Input As String) As String
+        Dim ffmpegProcessInfo As New ProcessStartInfo
+        Dim ffmpegProcess As Process
+        ffmpegProcessInfo.FileName = "ffmpeg.exe"
+        ffmpegProcessInfo.Arguments = "-i """ + Input + """ -af asetnsamples=1024 -vn -f framemd5 - -y"
+        ffmpegProcessInfo.CreateNoWindow = True
+        ffmpegProcessInfo.RedirectStandardOutput = True
+        ffmpegProcessInfo.UseShellExecute = False
+        ffmpegProcess = Process.Start(ffmpegProcessInfo)
+        Dim FrameMD5String As String = String.Empty
+        While Not ffmpegProcess.HasExited
+            While Not ffmpegProcess.StandardOutput.EndOfStream
+                Dim CurrentLine As String = ffmpegProcess.StandardOutput.ReadLine.Trim + Environment.NewLine()
+                FrameMD5String += CurrentLine
+            End While
+        End While
+        Return FrameMD5String
+    End Function
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
         ListView1.Items.Clear()
         ListView2.Items.Clear()
         ListBox1.Items.Clear()
+        ListBox2.Items.Clear()
+        SourceFrameMd5List.Clear()
+        DestFrameMd5List.Clear()
+        SourceFrameMd5MismatchList.Clear()
+        DestFrameMd5MismatchList.Clear()
     End Sub
 
     Private Sub SaveResults(listView As ListView)
@@ -146,7 +224,13 @@ Public Class Form1
                 ElseIf listView.Items(listView.Items.IndexOf(item)).BackColor = Color.Red Then
                     HashResult = "MISMATCH"
                 End If
-                VerifiedResults += """" + listView.Items(listView.Items.IndexOf(item)).Text + """," + HashResult + "," + ListBox1.Items(listView.Items.IndexOf(item)) + Environment.NewLine
+                VerifiedResults += """" + listView.Items(listView.Items.IndexOf(item)).Text + """," + HashResult + "," +
+                    ListBox1.Items(listView.Items.IndexOf(item)) + ","
+                If ListBox2.Items(listView.Items.IndexOf(item)) = "1" Then
+                    VerifiedResults += " frame mismatch" + Environment.NewLine
+                Else
+                    VerifiedResults += " frame mismatches" + Environment.NewLine
+                End If
             Next
             IO.File.WriteAllText(saveFileDialog.FileName, VerifiedResults)
             MessageBox.Show("File list saved")
@@ -175,5 +259,29 @@ Public Class Form1
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         CheckFfmpeg()
+    End Sub
+
+    Private Sub ListView1_DoubleClick(sender As Object, e As EventArgs) Handles ListView1.DoubleClick
+        If ListView1.SelectedItems.Count > 0 Then
+            FrameMD5Viewer.RichTextBox1.Text = SourceFrameMd5List(ListView1.SelectedItems.Item(0).Index)
+            FrameMD5Viewer.RichTextBox2.Text = DestFrameMd5List(ListView1.SelectedItems.Item(0).Index)
+            FrameMD5Viewer.ShowDialog()
+        End If
+    End Sub
+
+    Private Sub ListView2_DoubleClick(sender As Object, e As EventArgs) Handles ListView2.DoubleClick
+        If ListView2.SelectedItems.Count > 0 Then
+            FrameMD5Viewer.RichTextBox1.Text = SourceFrameMd5List(ListView2.SelectedItems.Item(0).Index)
+            FrameMD5Viewer.RichTextBox2.Text = DestFrameMd5List(ListView2.SelectedItems.Item(0).Index)
+            FrameMD5Viewer.ShowDialog()
+        End If
+    End Sub
+
+    Private Sub ListBox2_DoubleClick(sender As Object, e As EventArgs) Handles ListBox2.DoubleClick
+        If ListBox2.SelectedIndices.Count > 0 Then
+            FrameMD5Viewer.RichTextBox1.Text = SourceFrameMd5MismatchList(ListBox2.SelectedIndex)
+            FrameMD5Viewer.RichTextBox2.Text = DestFrameMd5MismatchList(ListBox2.SelectedIndex)
+            FrameMD5Viewer.ShowDialog()
+        End If
     End Sub
 End Class
