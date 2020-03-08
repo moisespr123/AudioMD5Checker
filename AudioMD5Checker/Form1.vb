@@ -262,7 +262,7 @@ Public Class Form1
     End Sub
 
     Private Sub ListView1_DoubleClick(sender As Object, e As EventArgs) Handles ListView1.DoubleClick
-        If ListView1.SelectedItems.Count > 0 And SourceFrameMd5List.Count > ListView1.SelectedItems.Item(0).Index And DestFrameMd5List.Count > ListView1.SelectedItems.Item(0).Index Then
+        If ListView1.SelectedItems.Count > 0 And SourceFrameMd5List.Count > ListView1.SelectedItems.Item(0).Index Then
             FrameMD5Viewer.RichTextBox1.Text = SourceFrameMd5List(ListView1.SelectedItems.Item(0).Index)
             FrameMD5Viewer.RichTextBox2.Text = DestFrameMd5List(ListView1.SelectedItems.Item(0).Index)
             FrameMD5Viewer.ShowDialog()
@@ -270,7 +270,7 @@ Public Class Form1
     End Sub
 
     Private Sub ListView2_DoubleClick(sender As Object, e As EventArgs) Handles ListView2.DoubleClick
-        If ListView2.SelectedItems.Count > 0 And SourceFrameMd5List.Count > ListView1.SelectedItems.Item(0).Index And DestFrameMd5List.Count > ListView1.SelectedItems.Item(0).Index Then
+        If ListView2.SelectedItems.Count > 0 And SourceFrameMd5List.Count > ListView2.SelectedItems.Item(0).Index Then
             FrameMD5Viewer.RichTextBox1.Text = SourceFrameMd5List(ListView2.SelectedItems.Item(0).Index)
             FrameMD5Viewer.RichTextBox2.Text = DestFrameMd5List(ListView2.SelectedItems.Item(0).Index)
             FrameMD5Viewer.ShowDialog()
@@ -279,7 +279,7 @@ Public Class Form1
 
     Private Sub ListBox2_DoubleClick(sender As Object, e As EventArgs) Handles ListBox2.DoubleClick
         If ListView1.Items.Count > 0 And ListView2.Items.Count > 0 Then
-            If ListBox2.SelectedIndices.Count > 0 And SourceFrameMd5MismatchList.Count > ListView1.SelectedItems.Item(0).Index And DestFrameMd5MismatchList.Count > ListView1.SelectedItems.Item(0).Index Then
+            If ListBox2.SelectedIndices.Count > 0 Then
                 FrameMD5Viewer.RichTextBox1.Text = SourceFrameMd5MismatchList(ListBox2.SelectedIndex)
                 FrameMD5Viewer.RichTextBox2.Text = DestFrameMd5MismatchList(ListBox2.SelectedIndex)
                 FrameMD5Viewer.ShowDialog()
