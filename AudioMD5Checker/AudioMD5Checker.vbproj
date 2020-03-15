@@ -87,6 +87,12 @@
     <Compile Include="FrameMD5Viewer.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="FrameSize.Designer.vb">
+      <DependentUpon>FrameSize.vb</DependentUpon>
+    </Compile>
+    <Compile Include="FrameSize.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -109,6 +115,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FrameMD5Viewer.resx">
       <DependentUpon>FrameMD5Viewer.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrameSize.resx">
+      <DependentUpon>FrameSize.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>

@@ -53,6 +53,18 @@ Namespace My
                 Return defaultInstance
             End Get
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("1024")>  _
+        Public Property FrameSize() As Decimal
+            Get
+                Return CType(Me("FrameSize"),Decimal)
+            End Get
+            Set
+                Me("FrameSize") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

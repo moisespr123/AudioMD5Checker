@@ -185,7 +185,7 @@ Public Class Form1
         Dim ffmpegProcessInfo As New ProcessStartInfo
         Dim ffmpegProcess As Process
         ffmpegProcessInfo.FileName = "ffmpeg.exe"
-        ffmpegProcessInfo.Arguments = "-i """ + Input + """ -af asetnsamples=1024 -vn -f framemd5 - -y"
+        ffmpegProcessInfo.Arguments = "-i """ + Input + """ -af asetnsamples=" + Convert.ToInt64(My.Settings.FrameSize).ToString + " -vn -f framemd5 - -y"
         ffmpegProcessInfo.CreateNoWindow = True
         ffmpegProcessInfo.RedirectStandardOutput = True
         ffmpegProcessInfo.UseShellExecute = False
@@ -285,5 +285,9 @@ Public Class Form1
                 FrameMD5Viewer.ShowDialog()
             End If
         End If
+    End Sub
+
+    Private Sub LinkLabel1_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles LinkLabel1.LinkClicked
+        FrameSize.ShowDialog()
     End Sub
 End Class
