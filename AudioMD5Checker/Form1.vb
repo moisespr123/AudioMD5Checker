@@ -1,6 +1,6 @@
 ﻿Imports System.IO
 Public Class Form1
-    Private Extensions As String() = {".ape", ".flac", ".m4a", ".mp3", ".wav"}
+    Private Extensions As String() = {".aiff", ".ape", ".flac", ".m4a", ".mp3", ".wav"}
     Private SourceFrameMd5List As List(Of String) = New List(Of String)
     Private DestFrameMd5List As List(Of String) = New List(Of String)
     Private SourceFrameMd5MismatchList As List(Of String) = New List(Of String)
