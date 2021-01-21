@@ -72,6 +72,7 @@ Public Class Form1
             Button1.Enabled = False
             Button2.Enabled = False
             Button3.Enabled = False
+            Button4.Enabled = False
             Dim StartTasks As New Threading.Thread(Sub() CheckThread(ListView1Items, ListView2Items))
             StartTasks.Start()
         Else
@@ -88,6 +89,21 @@ Public Class Form1
                                 Button1.Enabled = True
                                 Button2.Enabled = True
                                 Button3.Enabled = True
+                                Button4.Enabled = True
+                            End Sub)
+        MsgBox("Done")
+    End Sub
+    Private Sub CheckThreadFlac(ListView1Items As ListViewItem())
+        Dim tasks = New List(Of Action)
+        For Each file In ListView1Items
+            tasks.Add(Sub() FlacChecker(file, ListView1Items))
+        Next
+        Parallel.Invoke(New ParallelOptions With {.MaxDegreeOfParallelism = Environment.ProcessorCount}, tasks.ToArray())
+        Button1.BeginInvoke(Sub()
+                                Button1.Enabled = True
+                                Button2.Enabled = True
+                                Button3.Enabled = True
+                                Button4.Enabled = True
                             End Sub)
         MsgBox("Done")
     End Sub
@@ -159,6 +175,23 @@ Public Class Form1
                                   ListView2.SelectedItems.Clear()
                               End Sub)
     End Sub
+    Private Sub FlacChecker(file As ListViewItem, ListView1Items As ListViewItem())
+        Dim Result As String = flac_test(file.Text)
+        If Result = "OK" Then
+            ListView1.BeginInvoke(Sub()
+                                      ListView1.Items(ListView1.Items.IndexOf(file)).BackColor = Color.LimeGreen
+                                  End Sub)
+        Else
+            ListView1.BeginInvoke(Sub()
+                                      ListView1.Items(ListView1.Items.IndexOf(file)).BackColor = Color.Red
+                                  End Sub)
+        End If
+        ListBox1.BeginInvoke(Sub()
+                                 ListBox1.Items(ListView1.Items.IndexOf(file)) = Result
+                                 SourceFrameMd5List(ListView1.Items.IndexOf(file)) = Result
+                             End Sub)
+
+    End Sub
     Private Function ffmpeg_process(Input As String) As String
         Dim ffmpegProcessInfo As New ProcessStartInfo
         Dim ffmpegProcess As Process
@@ -179,6 +212,40 @@ Public Class Form1
             End While
         End While
         Return CurrentLine
+    End Function
+
+    Private Function flac_test(Input As String) As String
+        Dim flacProcessInfo As New ProcessStartInfo
+        Dim flacProcess As Process
+        Dim ok As String = String.Empty
+        flacProcessInfo.FileName = "flac.exe"
+        flacProcessInfo.Arguments = "-t """ + Input + """"
+        flacProcessInfo.CreateNoWindow = True
+        flacProcessInfo.RedirectStandardError = True
+        flacProcessInfo.UseShellExecute = False
+        flacProcess = Process.Start(flacProcessInfo)
+        Dim CurrentLine As String = String.Empty
+        While Not flacProcess.HasExited
+            While Not flacProcess.StandardError.EndOfStream
+                CurrentLine = flacProcess.StandardError.ReadLine
+                If CurrentLine.Contains("ok") Or CurrentLine.Contains(": ok") Then
+                    ok = "OK"
+                ElseIf CurrentLine.Contains("ERROR while decoding") Then
+                    CurrentLine = flacProcess.StandardError.ReadLine
+                    If CurrentLine.Contains("state = ") Then
+                        Return CurrentLine.Split("=")(1).Trim()
+                    End If
+                    Exit While
+                ElseIf CurrentLine.Contains("WARNING, ") Then
+                    Dim splittedLine As String() = CurrentLine.Split(",")
+                    If flacProcess.StandardError.ReadLine.Trim() = "ok" Then
+                        Return "OK"
+                    End If
+                    Return splittedLine(splittedLine.Length - 1).Trim()
+                End If
+            End While
+        End While
+        Return ok
     End Function
 
     Private Function ffmpeg__framemd5_process(Input As String) As String
@@ -289,5 +356,30 @@ Public Class Form1
 
     Private Sub LinkLabel1_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles LinkLabel1.LinkClicked
         FrameSize.ShowDialog()
+    End Sub
+
+    Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
+        ListView1.SelectedItems.Clear()
+        Dim ListView1Items As ListViewItem() = New ListViewItem(ListView1.Items.Count - 1) {}
+        ListView1.Items.CopyTo(ListView1Items, 0)
+        SourceFrameMd5List.Clear()
+        DestFrameMd5List.Clear()
+        SourceFrameMd5MismatchList.Clear()
+        DestFrameMd5MismatchList.Clear()
+        ListBox1.Items.Clear()
+        For Each item In ListView1Items
+            SourceFrameMd5List.Add(String.Empty)
+            SourceFrameMd5MismatchList.Add(String.Empty)
+            DestFrameMd5List.Add(String.Empty)
+            DestFrameMd5MismatchList.Add(String.Empty)
+            ListBox1.Items.Add(String.Empty)
+            ListBox2.Items.Add(String.Empty)
+        Next
+        Button1.Enabled = False
+        Button2.Enabled = False
+        Button3.Enabled = False
+        Button4.Enabled = False
+        Dim StartTasks As New Threading.Thread(Sub() CheckThreadFlac(ListView1Items))
+        StartTasks.Start()
     End Sub
 End Class

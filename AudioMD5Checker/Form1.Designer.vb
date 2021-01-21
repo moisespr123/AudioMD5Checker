@@ -38,6 +38,7 @@ Partial Class Form1
         Me.ListBox2 = New System.Windows.Forms.ListBox()
         Me.Label5 = New System.Windows.Forms.Label()
         Me.LinkLabel1 = New System.Windows.Forms.LinkLabel()
+        Me.Button4 = New System.Windows.Forms.Button()
         Me.TableLayoutPanel1.SuspendLayout()
         Me.Panel1.SuspendLayout()
         Me.Panel2.SuspendLayout()
@@ -225,12 +226,23 @@ Partial Class Form1
         Me.LinkLabel1.TabStop = True
         Me.LinkLabel1.Text = "Set Frame Size"
         '
+        'Button4
+        '
+        Me.Button4.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Button4.Location = New System.Drawing.Point(685, 393)
+        Me.Button4.Name = "Button4"
+        Me.Button4.Size = New System.Drawing.Size(257, 52)
+        Me.Button4.TabIndex = 4
+        Me.Button4.Text = "Test FLACs"
+        Me.Button4.UseVisualStyleBackColor = True
+        '
         'Form1
         '
         Me.AllowDrop = True
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1213, 486)
+        Me.Controls.Add(Me.Button4)
         Me.Controls.Add(Me.LinkLabel1)
         Me.Controls.Add(Me.ListBox2)
         Me.Controls.Add(Me.Label5)
@@ -266,4 +278,5 @@ Partial Class Form1
     Friend WithEvents ListBox2 As ListBox
     Friend WithEvents Label5 As Label
     Friend WithEvents LinkLabel1 As LinkLabel
+    Friend WithEvents Button4 As Button
 End Class
